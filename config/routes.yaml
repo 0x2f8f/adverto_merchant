@@ -1,0 +1,13 @@
+company_connection:
+    resource: ../src/CompanyConnection/Controller/
+    type: annotation
+    prefix: api/v1
+
+core:
+    resource: ../src/Core/Controller/
+    type: annotation
+    prefix: api/v1
+
+kernel:
+    resource: ../src/Kernel.php
+    type: annotation

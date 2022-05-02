@@ -1,0 +1,90 @@
+doctrine:
+    dbal:
+        types:
+            geometry:
+                class: CrEOF\Spatial\DBAL\Types\GeometryType
+            multipolygon:
+                class: CrEOF\Spatial\DBAL\Types\Geometry\MultiPolygonType
+            point:
+                class: CrEOF\Spatial\DBAL\Types\Geometry\PointType
+        default_connection: default
+        connections:
+            default:
+                server_version: 10.6.4
+                url: '%env(DATABASE_URL)%'
+                mapping_types:
+                    enum: string
+                driver: pdo_mysql
+                logging: true
+                profiling: true
+                profiling_collect_backtrace: false
+                profiling_collect_schema_errors: true
+                options: {  }
+                default_table_options: {  }
+                slaves: {  }
+                replicas: {  }
+                shards: {  }
+
+        # IMPORTANT: You MUST configure your server version,
+        # either here or in the DATABASE_URL env var (see .env file)
+        #server_version: '13'
+    orm:
+        auto_generate_proxy_classes: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: true
+        mappings:
+            Accounting:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Accounting/Entity'
+                prefix: 'App\Accounting\Entity'
+                alias: Accounting
+            Adverts:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Adverts/Entity'
+                prefix: 'App\Adverts\Entity'
+                alias: Adverts
+            Companies:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Companies/Entity'
+                prefix: 'App\Companies\Entity'
+                alias: Companies
+            Core:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Core/Entity'
+                prefix: 'App\Core\Entity'
+                alias: Core
+            Import:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Import/Entity'
+                prefix: 'App\Import\Entity'
+                alias: Import
+            Users:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Users/Entity'
+                prefix: 'App\Users\Entity'
+                alias: Users
+
+when@test:
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

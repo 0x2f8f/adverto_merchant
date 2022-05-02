@@ -1,0 +1,52 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Accounting/Entity/'
+            - '../src/Adverts/Entity/'
+            - '../src/Companies/Entity/'
+            - '../src/Core/Entity/'
+            - '../src/Import/Entity/'
+            - '../src/Users/Entity/'
+            - '../src/Kernel.php'
+
+    App\OpenApi\CompanyConnectionDecorator:
+        decorates: 'api_platform.openapi.factory'
+        arguments: [ '@.inner' ]
+
+    app.adverto_v2_authenticator:
+        class: App\Security\AdvertoV2Authenticator
+        parent: lexik_jwt_authentication.security.jwt_authenticator
+        arguments:
+            $jwtManager: '@lexik_jwt_authentication.jwt_manager'
+            $eventDispatcher: '@event_dispatcher'
+            $tokenExtractor: '@lexik_jwt_authentication.extractor.chain_extractor'
+            $userProvider: '@security.user.provider.concrete.app_user_provider'
+            $translator: ~
+
+    app.validator.base:
+        class: App\Core\Validator\BaseValidator
+        arguments:
+            $validator: Symfony\Component\Validator\Validator\RecursiveValidator
+
+    App\Core\Service\RedisCacheService:
+        arguments:
+            $dsn: '%env(REDIS_DSN)%'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
